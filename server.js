@@ -10,7 +10,7 @@ app.use(express.urlencoded({ limit: "50mb", extended: true }));
 
 app.use(webhook)
 app.get('/help', (req, res) => {
-  res.send('teste');
+  res.send('Ok');
 });
 
 
