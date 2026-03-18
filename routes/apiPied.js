@@ -1,12 +1,13 @@
+require("dotenv").config({ path: require("path").resolve(__dirname, "../.env") });
 const axios = require("axios");
 
 async function getPied(code) {
   try {
-    const response = await axios.get("http://100.112.197.108:2000/pied", {
+    const response = await axios.get(`${process.env.PIED_API_URL}/pied`, {
       params: { code: String(code) },
       headers: {
         Authorization:
-          "Bearer 037c38442578278f9d5947abf976c9a36b914380ff55d9387cb7a50e5fd25086",
+          `Bearer ${process.env.PIED_API_KEY}`,
       },
       timeout: 120000,  
       proxy: false,  
@@ -46,4 +47,3 @@ async function getPied(code) {
 }
 
 module.exports = { getPied };
-

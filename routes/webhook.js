@@ -1,3 +1,4 @@
+require("dotenv").config({ path: require("path").resolve(__dirname, "../.env") });
 const express = require("express");
 const axios = require("axios");
 const { Pool } = require("pg");
@@ -7,18 +8,18 @@ app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ extended: true, limit:"50mb"}));
 
 const pool = new Pool({
-  host: "100.121.143.49",
-  port: 5432,
-  user: "postgres",
-  password: "3131",
-  database: "db_suno",
+  host: process.env.DB_HOST,
+  port: process.env.DB_PORT,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASS,
+  database: process.env.DB_NAME,
 });
 
 async function getOrderByCode(code) {
-  const resp = await axios.get("http://100.112.197.108:2000/pied", {
+  const resp = await axios.get(`${process.env.PIED_API_URL}/pied`, {
     params: { code },
     headers: {
-      Authorization: "Bearer 037c38442578278f9d5947abf976c9a36b914380ff55d9387cb7a50e5fd25086",
+      Authorization: `Bearer ${process.env.PIED_API_KEY}`,
     },
     maxBodyLength: Infinity,
     timeout: 120000,
@@ -102,9 +103,9 @@ async function runWorker() {
       let config = {
         method: 'get',
         maxBodyLength: Infinity,
-        url: `http://100.112.197.108:2000/repasse?code=${codeRepasse}`,
+        url: `${process.env.PIED_API_URL}/repasse?code=${codeRepasse}`,
         headers: {
-          'Authorization': 'Bearer 037c38442578278f9d5947abf976c9a36b914380ff55d9387cb7a50e5fd25086'
+          'Authorization': `Bearer ${process.env.PIED_API_KEY}`
         }
       };
 
@@ -138,9 +139,9 @@ async function runWorker() {
         let config = {
           method: 'get',
           maxBodyLength: Infinity,
-          url: `http://100.112.197.108:2000/finish?code=${codeFinalizado}`,
+          url: `${process.env.PIED_API_URL}/finish?code=${codeFinalizado}`,
           headers: {
-            'Authorization': 'Bearer 037c38442578278f9d5947abf976c9a36b914380ff55d9387cb7a50e5fd25086'
+            'Authorization': `Bearer ${process.env.PIED_API_KEY}`
           }
         };
 
@@ -197,7 +198,7 @@ app.post("/order", (req, res) => {
     return res.status(401).send("Não foi encontrado o header Authorization");
   }
 
-  if (authHeader !== "Bearer 87654321") {
+  if (authHeader !== `Bearer ${process.env.WEBHOOK_AUTH_TOKEN}`) {
     console.log("[WEBHOOK][AUTH] token inválido:", authHeader);
     return res.status(403).send("Token inválido");
   }
